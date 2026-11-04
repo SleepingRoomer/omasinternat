@@ -184,14 +184,14 @@ input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--tu
       </button>
     </div>
     <div class="progres" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="barre"></div></div>
-    <div class="demo" id="demo" hidden>Aperçu : les réponses ne sont pas enregistrées</div>
+    <div class="demo" id="demo" hidden></div>
   </div>
 
   <main id="contenu" aria-live="polite">
     <div class="chargement"><span class="rond-charge" aria-hidden="true"></span>Chargement du menu…</div>
   </main>
 
-  <p class="pied">OMAS Internat · Vos réponses ne sont vues que par les organisateurs.</p>
+  <p class="pied">OMAS Internat</p>
 </div>
 
 <script>
@@ -202,8 +202,8 @@ const API_SAISIE = "https://script.google.com/macros/s/AKfycbyR_NRdaUTwkOHzut4ib
 const API = !API_SAISIE ? "" : /^https?:\/\//.test(API_SAISIE.trim()) ? API_SAISIE.trim() : `https://script.google.com/macros/s/${API_SAISIE.trim()}/exec`;
 
 const EXEMPLE = {
-  evenement: "Dîner de rentrée des internes",
-  dateLimite: "15 novembre",
+  evenement: "Accueil des néo-internes",
+  dateLimite: "5 novembre",
   ouvert: true,
   remarques: true,
   etapes: [
