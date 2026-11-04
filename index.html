@@ -78,13 +78,27 @@ h2 { font-size: clamp(24px, 6vw, 31px); line-height: 1.15; }
   box-shadow: var(--sticker);
   display: grid; gap: 14px;
 }
-.billet::after {
-  content: ""; position: absolute; z-index: 0; right: -64px; top: -64px; width: 150px; height: 150px; border-radius: 50%;
-  border: 18px solid rgba(0, 160, 154, .55);
-}
 .billet > * { position: relative; z-index: 1; }
 .billet .etiquette { color: #B9F3EA; }
-.billet h1 { color: var(--blanc); max-width: 88%; }
+.billet h1 { color: var(--blanc); padding-right: 76px; }
+.billet .assiette {
+  position: absolute; top: 20px; right: 20px;
+  width: 64px; height: 64px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--turquoise); color: var(--blanc);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .25);
+  transform: rotate(-8deg);
+}
+.billet .assiette svg { width: 40px; height: 40px; }
+.icone-etape {
+  width: 52px; height: 52px; border-radius: 16px;
+  display: grid; place-items: center;
+  background: var(--turquoise-pale); color: var(--turquoise-fonce);
+  border: 2px solid #B9F3EA;
+}
+.icone-etape svg { width: 30px; height: 30px; }
+.recap .cat { display: inline-flex; align-items: center; gap: 7px; }
+.recap .cat svg { width: 17px; height: 17px; color: var(--turquoise-fonce); flex: none; }
 .billet .puces { display: flex; flex-wrap: wrap; gap: 8px; }
 .billet .puces span { font: 600 14px var(--font); padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .14); }
 .billet .puces .chaud { background: var(--soleil); color: var(--encre); }
@@ -236,6 +250,25 @@ document.getElementById("demo").hidden = !DEMO;
 const echapper = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const prenom = () => etat.nom.split(" ")[0];
 const LETTRES = "ABCDEFGHIJKLMNOP";
+
+// Petites icônes au trait, choisies d'après le nom de l'étape (Entrée, Plat, Dessert, Boisson…)
+const TRAIT = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+const ICONES = {
+  assiette: `<svg viewBox="0 0 32 32" ${TRAIT}><circle cx="16" cy="16" r="7.5"/><circle cx="16" cy="16" r="4" opacity=".55"/><path d="M3.5 5v5.5a2 2 0 0 0 4 0V5M5.5 5v22"/><path d="M28.5 27V5c-2.2 1.6-3.3 4.4-3.3 8.5V17h3.3"/></svg>`,
+  entree: `<svg viewBox="0 0 24 24" ${TRAIT}><path d="M3.5 12h17a8.5 8.5 0 0 1-17 0z"/><path d="M8 20.5h8"/><path d="M9 3.5c-1 1.3 1 2.4 0 4.2M13 3.5c-1 1.3 1 2.4 0 4.2"/></svg>`,
+  plat: `<svg viewBox="0 0 24 24" ${TRAIT}><path d="M2.5 18.5h19"/><path d="M4.5 18.5a7.5 7.5 0 0 1 15 0"/><path d="M12 11V8.5M10.3 8.5h3.4"/><path d="M8.2 15a4 4 0 0 1 2.3-1.8"/></svg>`,
+  dessert: `<svg viewBox="0 0 24 24" ${TRAIT}><path d="M6 12.5 7.6 20.5h8.8L18 12.5"/><path d="M5 12.5a3 3 0 0 1 1.6-5.3 5.5 5.5 0 0 1 10.8 0 3 3 0 0 1 1.6 5.3z"/><path d="M12 2.5v1.5"/></svg>`,
+  boisson: `<svg viewBox="0 0 24 24" ${TRAIT}><path d="M6.5 3.5h11l-1.6 16a1.5 1.5 0 0 1-1.5 1.3H9.6a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M7.2 9.5h9.6"/></svg>`,
+  remarque: `<svg viewBox="0 0 24 24" ${TRAIT}><path d="M12 3.5 3.5 19.5h17z"/><path d="M12 10v4.5M12 17.2v.1"/></svg>`
+};
+function iconeEtape(titre) {
+  const t = titre.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  if (/entree|soupe|salade|starter/.test(t)) return ICONES.entree;
+  if (/dessert|gateau|patisserie/.test(t)) return ICONES.dessert;
+  if (/boisson|jus|the|cafe|drink/.test(t)) return ICONES.boisson;
+  if (/plat|principal|resistance/.test(t)) return ICONES.plat;
+  return ICONES.assiette;
+}
 const COCHE = '<svg class="coche" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
 // ---------- Échanges avec le Google Sheet ----------
@@ -360,6 +393,7 @@ function listeEtapes() {
 function ecranAccueil() {
   poser(`
     <div class="billet">
+      <span class="assiette">${ICONES.assiette}</span>
       <span class="etiquette">Choix du menu</span>
       <h1>${echapper(CONFIG.evenement)}</h1>
       <div class="puces">
@@ -406,6 +440,7 @@ function ecranEtape(i) {
   const question = i === 0 ? `${echapper(prenom())}, on commence par ${echapper(mot)} ?` : `Et ${echapper(mot)} ?`;
   poser(`
     <div class="entete">
+      <span class="icone-etape">${iconeEtape(e.titre)}</span>
       <span class="etiquette">${echapper(e.titre)} · ${i + 1} sur ${N}</span>
       <h2>${question}</h2>
     </div>
@@ -430,6 +465,7 @@ function selectionner(i, k) {
 function ecranRemarques() {
   poser(`
     <div class="entete">
+      <span class="icone-etape">${ICONES.remarque}</span>
       <span class="etiquette">Pour le restaurant</span>
       <h2>Une allergie, une intolérance ou une remarque ?</h2>
       <p class="chapeau">Facultatif. Seuls les organisateurs verront ce que vous écrivez.</p>
@@ -456,13 +492,13 @@ function ecranRemarques() {
 function ecranRecap(erreur = "") {
   const lignes = CONFIG.etapes.map((e, i) => `
     <div class="ligne">
-      <span class="cat">${echapper(e.titre)}</span>
+      <span class="cat">${iconeEtape(e.titre)}${echapper(e.titre)}</span>
       <span class="val">${echapper(etat.choix[e.titre])}</span>
       <button class="modif" type="button" data-ecran="${i}" aria-label="Modifier : ${echapper(e.titre)}">Modifier</button>
     </div>`).join("");
   const rem = CONFIG.remarques ? `
     <div class="ligne">
-      <span class="cat">Allergies et remarques</span>
+      <span class="cat">${ICONES.remarque}Allergies et remarques</span>
       <span class="val${etat.remarques ? "" : " vide"}">${echapper(etat.remarques || "Rien à signaler")}</span>
       <button class="modif" type="button" data-ecran="remarques" aria-label="Modifier les remarques">Modifier</button>
     </div>` : "";
