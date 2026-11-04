@@ -197,7 +197,9 @@ input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--tu
 <script>
 // ===== Réglage unique : l'adresse de l'application Web Google Apps Script (se termine par /exec) =====
 // Laissée vide, la page fonctionne en aperçu avec un menu d'exemple et n'enregistre rien.
-const API = "AKfycbyR_NRdaUTwkOHzut4ibHTkCVggywAcHd6k0WdMpPL7SJBzyr9udGSErk_cnitgMDEyiA";
+const API_SAISIE = "https://script.google.com/macros/s/AKfycbyR_NRdaUTwkOHzut4ibHTkCVggywAcHd6k0WdMpPL7SJBzyr9udGSErk_cnitgMDEyiA/exec";
+// Accepte aussi l'identifiant seul (AKfy...) : on reconstruit alors l'adresse complète
+const API = !API_SAISIE ? "" : /^https?:\/\//.test(API_SAISIE.trim()) ? API_SAISIE.trim() : `https://script.google.com/macros/s/${API_SAISIE.trim()}/exec`;
 
 const EXEMPLE = {
   evenement: "Dîner de rentrée des internes",
@@ -243,7 +245,11 @@ async function appel(options = {}) {
   const minuteur = setTimeout(() => ctrl.abort(), 20000);
   try {
     const r = await fetch(API, { ...options, signal: ctrl.signal });
-    const data = await r.json();
+    const texte = await r.text();
+    let data;
+    try { data = JSON.parse(texte); } catch (_) {
+      throw new Error(texte.trim().startsWith("<") ? "le Google Sheet a renvoyé une page au lieu des données : vérifiez l'adresse et que l'accès est « Tout le monde »" : "réponse illisible");
+    }
     if (data && data.ok === false) throw new Error(data.erreur || "erreur du serveur");
     return data;
   } catch (e) {
