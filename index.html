@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choix du menu OMAS Internat</title>
+<meta name="description" content="Choisissez votre menu pour le prochain événement OMAS Internat.">
+<meta property="og:title" content="Choix du menu · OMAS Internat">
+<meta property="og:description" content="Une minute pour choisir votre entrée, votre plat et votre dessert.">
+<meta name="theme-color" content="#2D2F84">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Identité OMAS : indigo et turquoise du logo, ombre « sticker » nette reprise du design system OMAS Externat.
+     Mise en page : une question par écran, colonne étroite pensée pour le téléphone. */
+  --indigo: #2D2F84;
+  --indigo-fonce: #232569;
+  --indigo-pale: #EEEDFA;
+  --turquoise: #00A09A;
+  --turquoise-fonce: #016B67;
+  --turquoise-pale: #E3FBF7;
+  --soleil: #FFC94A;
+  --corail: #DB4726;
+  --encre: #1D1E3A;
+  --encre-2: #565883;
+  --trait: #DEDFEC;
+  --page: #F7F7FB;
+  --blanc: #FFFFFF;
+  --sticker: 4px 4px 0 rgba(45, 47, 132, .4);
+  --sticker-turquoise: 5px 5px 0 rgba(0, 132, 127, .4);
+  --rebond: cubic-bezier(.34, 1.56, .64, 1);
+  --font-titre: "Poppins", system-ui, sans-serif;
+  --font: "Karla", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { font-family: var(--font); color: var(--encre); background: var(--page); -webkit-font-smoothing: antialiased; }
+.app { min-height: 100%; max-width: 600px; margin: 0 auto; padding: 0 20px 40px; display: flex; flex-direction: column; }
+
+/* Barre du haut */
+.haut { position: sticky; top: 0; z-index: 2; background: var(--page); padding: 16px 0 14px; display: grid; gap: 14px; }
+.ligne-haut { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.marque { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.marque img { width: 40px; height: 40px; }
+.mot { display: grid; line-height: .9; font-family: var(--font-titre); font-weight: 900; text-shadow: 2px 2px 0 rgba(45, 47, 132, .28); }
+.mot .o { color: var(--indigo); font-size: 23px; letter-spacing: .01em; }
+.mot .i { color: var(--turquoise); font-size: 12.6px; letter-spacing: .02em; margin-top: 2px; }
+.retour {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  font: 600 15px var(--font); color: var(--indigo); padding: 8px 12px; border-radius: 999px;
+}
+.retour:hover { background: var(--indigo-pale); }
+.retour:focus-visible { outline: 3px solid var(--turquoise); }
+.retour[hidden] { display: none; }
+.progres { height: 8px; border-radius: 8px; background: var(--trait); overflow: hidden; }
+.progres div { height: 100%; width: 0; background: var(--turquoise); border-radius: 8px; transition: width .35s ease; }
+.demo { font: 600 13px var(--font); color: var(--indigo); background: var(--indigo-pale); border-radius: 999px; padding: 6px 12px; justify-self: start; }
+.demo[hidden] { display: none; }
+
+/* Écrans */
+.ecran { display: grid; gap: 22px; padding-top: 12px; animation: arrivee .3s ease-out; }
+.etiquette { font: 700 12.5px var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--turquoise-fonce); }
+h1, h2 { font-family: var(--font-titre); font-weight: 800; letter-spacing: -.01em; text-wrap: balance; margin: 0; color: var(--encre); }
+h1 { font-size: clamp(28px, 7vw, 38px); line-height: 1.1; }
+h2 { font-size: clamp(24px, 6vw, 31px); line-height: 1.15; }
+.chapeau { color: var(--encre-2); font-size: 17px; line-height: 1.55; margin: 0; max-width: 60ch; }
+.entete { display: grid; gap: 10px; }
+
+/* Carte de l'événement */
+.billet {
+  position: relative; overflow: hidden;
+  background: var(--indigo); color: var(--blanc);
+  border-radius: 24px; padding: 22px 22px 20px;
+  box-shadow: var(--sticker);
+  display: grid; gap: 14px;
+}
+.billet::after {
+  content: ""; position: absolute; z-index: 0; right: -64px; top: -64px; width: 150px; height: 150px; border-radius: 50%;
+  border: 18px solid rgba(0, 160, 154, .55);
+}
+.billet > * { position: relative; z-index: 1; }
+.billet .etiquette { color: #B9F3EA; }
+.billet h1 { color: var(--blanc); max-width: 88%; }
+.billet .puces { display: flex; flex-wrap: wrap; gap: 8px; }
+.billet .puces span { font: 600 14px var(--font); padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .14); }
+.billet .puces .chaud { background: var(--soleil); color: var(--encre); }
+
+label.champ { display: grid; gap: 8px; font: 700 15.5px var(--font); }
+input[type="text"], textarea {
+  font: 17px var(--font); color: var(--encre); width: 100%;
+  padding: 15px 16px; border-radius: 16px; border: 2px solid var(--trait); background: var(--blanc);
+  transition: border-color .15s, box-shadow .15s;
+}
+textarea { min-height: 120px; resize: vertical; line-height: 1.45; }
+input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--turquoise); box-shadow: 0 0 0 4px var(--turquoise-pale); }
+.erreur { color: var(--corail); font-size: 15px; font-weight: 600; margin: -8px 0 0; }
+.erreur:empty { display: none; }
+
+/* Cartes de choix */
+.choix { display: grid; gap: 12px; }
+.carte {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px; border-radius: 18px;
+  background: var(--blanc); border: 2px solid var(--trait);
+  transition: border-color .15s, background .15s, box-shadow .15s, transform .12s;
+}
+.carte:hover { border-color: #B6B3E9; }
+.carte:focus-visible { outline: 3px solid var(--turquoise); outline-offset: 2px; }
+.lettre {
+  width: 32px; height: 32px; flex: none; border-radius: 10px; display: grid; place-items: center;
+  font: 800 14px var(--font-titre); border: 2px solid var(--trait); color: var(--encre-2); transition: all .15s;
+}
+.carte .texte { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.carte .t { font: 600 16.5px/1.3 var(--font-titre); color: var(--encre); }
+.carte .d { font-size: 15px; color: var(--encre-2); }
+.carte .coche { width: 24px; height: 24px; flex: none; color: var(--indigo); opacity: 0; transform: scale(.5); transition: opacity .15s, transform .25s var(--rebond); }
+.carte.choisie { border-color: var(--indigo); background: var(--indigo-pale); box-shadow: var(--sticker); transform: translate(-2px, -2px); }
+.carte.choisie .lettre { background: var(--indigo); border-color: var(--indigo); color: var(--blanc); }
+.carte.choisie .coche { opacity: 1; transform: none; }
+
+/* Boutons */
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.bouton {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 54px; padding: 0 26px; border-radius: 999px;
+  font: 700 16.5px var(--font-titre); background: var(--indigo); color: var(--blanc);
+  box-shadow: var(--sticker); transition: background .15s, transform .1s, box-shadow .1s;
+}
+.bouton:hover { background: var(--indigo-fonce); }
+.bouton:active { transform: translate(3px, 3px); box-shadow: none; }
+.bouton:focus-visible { outline: 3px solid var(--turquoise); outline-offset: 3px; }
+.bouton.secondaire { background: var(--blanc); color: var(--indigo); border: 2px solid var(--indigo); box-shadow: none; }
+.bouton.secondaire:hover { background: var(--indigo-pale); }
+.bouton[aria-disabled="true"] { opacity: .5; cursor: default; }
+.bouton.large { width: 100%; }
+.astuce { font-size: 14px; color: var(--encre-2); margin: 0; }
+.astuce kbd { font: 700 12px var(--font); border: 2px solid var(--trait); border-radius: 6px; padding: 0 6px; background: var(--blanc); }
+@media (hover: none) { .astuce.clavier { display: none; } }
+
+/* Récapitulatif */
+.recap { background: var(--blanc); border: 2px solid var(--trait); border-radius: 20px; overflow: hidden; }
+.recap .ligne { display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; align-items: center; padding: 14px 16px; border-bottom: 2px solid var(--page); }
+.recap .ligne:last-child { border-bottom: none; }
+.recap .cat { font: 700 12.5px var(--font); color: var(--encre-2); text-transform: uppercase; letter-spacing: .07em; }
+.recap .val { font: 600 16.5px/1.35 var(--font-titre); grid-column: 1; overflow-wrap: anywhere; }
+.recap .val.vide { color: var(--encre-2); font-family: var(--font); font-weight: 500; }
+.recap .modif { all: unset; cursor: pointer; grid-column: 2; grid-row: 1 / span 2; font: 700 15px var(--font); color: var(--turquoise-fonce); padding: 8px 12px; border-radius: 999px; }
+.recap .modif:hover { background: var(--turquoise-pale); }
+.recap .modif:focus-visible { outline: 3px solid var(--turquoise); }
+
+/* Fin, chargement */
+.medaille { width: 80px; height: 80px; border-radius: 50%; background: var(--turquoise); color: var(--blanc); display: grid; place-items: center; box-shadow: var(--sticker-turquoise); animation: pop .5s var(--rebond); }
+.rond-charge { width: 22px; height: 22px; border: 3px solid rgba(255, 255, 255, .35); border-top-color: var(--blanc); border-radius: 50%; animation: tourne .8s linear infinite; }
+.chargement { display: flex; align-items: center; gap: 12px; color: var(--encre-2); font-size: 17px; padding-top: 24px; }
+.chargement .rond-charge { border-color: var(--trait); border-top-color: var(--indigo); }
+.pied { margin-top: auto; padding-top: 36px; font-size: 13.5px; color: var(--encre-2); text-align: center; }
+
+@keyframes arrivee { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes tourne { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .ecran, .medaille { animation: none; }
+  .progres div, .carte, .carte .coche { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="haut">
+    <div class="ligne-haut">
+      <div class="marque" aria-label="OMAS Internat">
+        <img src="assets/omas-coeur.png" alt="" width="40" height="40">
+        <span class="mot" aria-hidden="true"><span class="o">OMAS</span><span class="i">INTERNAT</span></span>
+      </div>
+      <button class="retour" id="retour" type="button" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        Retour
+      </button>
+    </div>
+    <div class="progres" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="barre"></div></div>
+    <div class="demo" id="demo" hidden>Aperçu : les réponses ne sont pas enregistrées</div>
+  </div>
+
+  <main id="contenu" aria-live="polite">
+    <div class="chargement"><span class="rond-charge" aria-hidden="true"></span>Chargement du menu…</div>
+  </main>
+
+  <p class="pied">OMAS Internat · Vos réponses ne sont vues que par les organisateurs.</p>
+</div>
+
+<script>
+// ===== Réglage unique : l'adresse de l'application Web Google Apps Script (se termine par /exec) =====
+// Laissée vide, la page fonctionne en aperçu avec un menu d'exemple et n'enregistre rien.
+const API = "";
+
+const EXEMPLE = {
+  evenement: "Dîner de rentrée des internes",
+  dateLimite: "15 novembre",
+  ouvert: true,
+  remarques: true,
+  etapes: [
+    { titre: "Entrée", options: [{ titre: "Soupe de lentilles" }, { titre: "Salade orientale" }, { titre: "Briouates" }] },
+    { titre: "Plat", options: [
+      { titre: "Tajine d'agneau", description: "Pruneaux et amandes" },
+      { titre: "Poulet rôti", description: "Pommes de terre au four" },
+      { titre: "Pavé de saumon", description: "Riz et légumes" },
+      { titre: "Couscous végétarien" }
+    ]},
+    { titre: "Dessert", options: [{ titre: "Fondant au chocolat" }, { titre: "Salade de fruits" }, { titre: "Pâtisseries orientales" }] }
+  ]
+};
+
+const DEMO = !API;
+let CONFIG = null;
+let N = 0;
+let totalEcrans = 0;
+
+const contenu = document.getElementById("contenu");
+const barre = document.getElementById("barre");
+const retour = document.getElementById("retour");
+const calme = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Écrans : "accueil", 0..N-1 (une étape du menu), "remarques", "recap", "fin", "ferme", "panne"
+const etat = { ecran: "accueil", nom: "", choix: {}, remarques: "", depuisRecap: false, envoi: false };
+
+document.getElementById("demo").hidden = !DEMO;
+
+const echapper = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const prenom = () => etat.nom.split(" ")[0];
+const LETTRES = "ABCDEFGHIJKLMNOP";
+const COCHE = '<svg class="coche" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+// ---------- Échanges avec le Google Sheet ----------
+
+async function appel(options = {}) {
+  const ctrl = new AbortController();
+  const minuteur = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const r = await fetch(API, { ...options, signal: ctrl.signal });
+    const data = await r.json();
+    if (data && data.ok === false) throw new Error(data.erreur || "erreur du serveur");
+    return data;
+  } catch (e) {
+    if (e.name === "AbortError") throw new Error("le serveur ne répond pas");
+    throw e;
+  } finally {
+    clearTimeout(minuteur);
+  }
+}
+
+async function chargerConfig() {
+  if (DEMO) return EXEMPLE;
+  return appel();
+}
+
+function envoyerAuServeur(donnees) {
+  if (DEMO) return new Promise((ok) => setTimeout(() => ok({ misAJour: false }), 800));
+  // Corps envoyé en texte brut : c'est ce qui permet à Google d'accepter la requête depuis GitHub Pages
+  return appel({ method: "POST", body: JSON.stringify(donnees) });
+}
+
+// ---------- Navigation ----------
+
+function avancement() {
+  let i = 0;
+  if (typeof etat.ecran === "number") i = etat.ecran + 1;
+  else if (etat.ecran === "remarques") i = N + 1;
+  else if (etat.ecran === "recap") i = totalEcrans;
+  else if (etat.ecran === "fin") i = totalEcrans + 1;
+  const pct = Math.round((i / (totalEcrans + 1)) * 100);
+  barre.style.width = pct + "%";
+  barre.parentElement.setAttribute("aria-valuenow", pct);
+}
+
+function precedent() {
+  const e = etat.ecran;
+  if (etat.depuisRecap && e !== "recap") return "recap";
+  if (e === 0) return "accueil";
+  if (typeof e === "number") return e - 1;
+  if (e === "remarques") return N - 1;
+  if (e === "recap") return CONFIG.remarques ? "remarques" : N - 1;
+  return null;
+}
+
+function suivant() {
+  const e = etat.ecran;
+  if (etat.depuisRecap) return "recap";
+  if (e === "accueil") return 0;
+  if (typeof e === "number" && e < N - 1) return e + 1;
+  if (typeof e === "number") return CONFIG.remarques ? "remarques" : "recap";
+  return "recap";
+}
+
+function aller(ecran) {
+  if (ecran === "recap") etat.depuisRecap = false;
+  etat.ecran = ecran;
+  afficher();
+  window.scrollTo({ top: 0, behavior: calme ? "auto" : "smooth" });
+}
+
+retour.addEventListener("click", () => {
+  const p = precedent();
+  if (p !== null) aller(p);
+});
+
+// ---------- Écrans ----------
+
+function afficher() {
+  avancement();
+  const e = etat.ecran;
+  retour.hidden = ["accueil", "fin", "ferme", "panne"].includes(e) || etat.envoi;
+  if (e === "ferme") return ecranFerme();
+  if (e === "accueil") return ecranAccueil();
+  if (typeof e === "number") return ecranEtape(e);
+  if (e === "remarques") return ecranRemarques();
+  if (e === "recap") return ecranRecap();
+  if (e === "fin") return ecranFin();
+}
+
+function poser(html) {
+  contenu.innerHTML = `<section class="ecran">${html}</section>`;
+}
+
+function ecranPanne(message) {
+  etat.ecran = "panne";
+  retour.hidden = true;
+  poser(`
+    <div class="entete">
+      <h1>Le menu n'a pas pu être chargé</h1>
+      <p class="chapeau">Vérifiez votre connexion internet puis réessayez. (${echapper(message)})</p>
+    </div>
+    <div class="actions"><button class="bouton" type="button" id="reessayer">Réessayer</button></div>`);
+  document.getElementById("reessayer").addEventListener("click", demarrer);
+}
+
+function ecranFerme() {
+  poser(`
+    <div class="entete">
+      <h1>Les choix de menu sont clos</h1>
+      <p class="chapeau">La commande pour « ${echapper(CONFIG.evenement)} » a été transmise au restaurant. Pour toute question, contactez les organisateurs.</p>
+    </div>`);
+}
+
+function listeEtapes() {
+  return CONFIG.etapes.map((x) => "votre " + echapper(x.titre.toLowerCase())).join(", ").replace(/, ([^,]*)$/, " et $1");
+}
+
+function ecranAccueil() {
+  poser(`
+    <div class="billet">
+      <span class="etiquette">Choix du menu</span>
+      <h1>${echapper(CONFIG.evenement)}</h1>
+      <div class="puces">
+        ${CONFIG.dateLimite ? `<span class="chaud">Avant le ${echapper(CONFIG.dateLimite)}</span>` : ""}
+        <span>${N} choix · 1 minute</span>
+      </div>
+    </div>
+    <p class="chapeau">Choisissez ${listeEtapes()}. Vous pourrez revenir modifier votre choix jusqu'à la date limite.</p>
+    <form id="form-nom" class="choix" novalidate>
+      <label class="champ" for="nom">Votre prénom et votre nom
+        <input type="text" id="nom" autocomplete="name" maxlength="80" placeholder="Ex. Sarah Benali" value="${echapper(etat.nom)}">
+      </label>
+      <p class="erreur" id="erreur-nom"></p>
+      <button class="bouton large" type="submit">Commencer</button>
+    </form>`);
+  const champ = document.getElementById("nom");
+  document.getElementById("form-nom").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const nom = champ.value.replace(/\s+/g, " ").trim();
+    const err = document.getElementById("erreur-nom");
+    if (nom.length < 2 || !/\p{L}/u.test(nom)) { err.textContent = "Indiquez votre prénom et votre nom."; champ.focus(); return; }
+    if (!nom.includes(" ")) { err.textContent = "Ajoutez aussi votre nom de famille, pour ne pas vous confondre avec un homonyme."; champ.focus(); return; }
+    etat.nom = nom;
+    aller(suivant());
+  });
+}
+
+function articleDe(mot) {
+  const feminins = ["entrée", "boisson", "soupe", "salade", "viande", "garniture", "sauce"];
+  if (/^[aeiouyéèêh]/i.test(mot)) return "l'" + mot;
+  return (feminins.includes(mot) ? "la " : "le ") + mot;
+}
+
+function ecranEtape(i) {
+  const e = CONFIG.etapes[i];
+  const actuel = etat.choix[e.titre];
+  const cartes = e.options.map((o, k) => `
+    <button type="button" class="carte${actuel === o.titre ? " choisie" : ""}" data-k="${k}" aria-pressed="${actuel === o.titre}">
+      <span class="lettre">${LETTRES[k]}</span>
+      <span class="texte"><span class="t">${echapper(o.titre)}</span>${o.description ? `<span class="d">${echapper(o.description)}</span>` : ""}</span>
+      ${COCHE}
+    </button>`).join("");
+  const mot = articleDe(e.titre.toLowerCase());
+  const question = i === 0 ? `${echapper(prenom())}, on commence par ${echapper(mot)} ?` : `Et ${echapper(mot)} ?`;
+  poser(`
+    <div class="entete">
+      <span class="etiquette">${echapper(e.titre)} · ${i + 1} sur ${N}</span>
+      <h2>${question}</h2>
+    </div>
+    <div class="choix" role="group" aria-label="${echapper(e.titre)}">${cartes}</div>
+    <p class="astuce clavier">Astuce : tapez <kbd>A</kbd>, <kbd>B</kbd>, <kbd>C</kbd>… pour choisir plus vite.</p>`);
+  contenu.querySelectorAll(".carte").forEach((b) => b.addEventListener("click", () => selectionner(i, +b.dataset.k)));
+}
+
+let verrou = false;
+function selectionner(i, k) {
+  if (verrou) return;
+  const e = CONFIG.etapes[i];
+  etat.choix[e.titre] = e.options[k].titre;
+  contenu.querySelectorAll(".carte").forEach((b, j) => {
+    b.classList.toggle("choisie", j === k);
+    b.setAttribute("aria-pressed", j === k);
+  });
+  verrou = true;
+  setTimeout(() => { verrou = false; aller(suivant()); }, calme ? 120 : 420);
+}
+
+function ecranRemarques() {
+  poser(`
+    <div class="entete">
+      <span class="etiquette">Pour le restaurant</span>
+      <h2>Une allergie, une intolérance ou une remarque ?</h2>
+      <p class="chapeau">Facultatif. Seuls les organisateurs verront ce que vous écrivez.</p>
+    </div>
+    <label class="champ" for="remarques">Votre remarque
+      <textarea id="remarques" maxlength="500" placeholder="Ex. allergie aux fruits à coque">${echapper(etat.remarques)}</textarea>
+    </label>
+    <div class="actions">
+      <button class="bouton" type="button" id="continuer">Continuer</button>
+      <button class="bouton secondaire" type="button" id="rien">Rien à signaler</button>
+    </div>`);
+  const zone = document.getElementById("remarques");
+  const maj = () => document.getElementById("continuer").setAttribute("aria-disabled", zone.value.trim() ? "false" : "true");
+  zone.addEventListener("input", maj);
+  maj();
+  document.getElementById("continuer").addEventListener("click", () => {
+    if (!zone.value.trim()) { zone.focus(); return; }
+    etat.remarques = zone.value.trim().slice(0, 500);
+    aller(suivant());
+  });
+  document.getElementById("rien").addEventListener("click", () => { etat.remarques = ""; aller(suivant()); });
+}
+
+function ecranRecap(erreur = "") {
+  const lignes = CONFIG.etapes.map((e, i) => `
+    <div class="ligne">
+      <span class="cat">${echapper(e.titre)}</span>
+      <span class="val">${echapper(etat.choix[e.titre])}</span>
+      <button class="modif" type="button" data-ecran="${i}" aria-label="Modifier : ${echapper(e.titre)}">Modifier</button>
+    </div>`).join("");
+  const rem = CONFIG.remarques ? `
+    <div class="ligne">
+      <span class="cat">Allergies et remarques</span>
+      <span class="val${etat.remarques ? "" : " vide"}">${echapper(etat.remarques || "Rien à signaler")}</span>
+      <button class="modif" type="button" data-ecran="remarques" aria-label="Modifier les remarques">Modifier</button>
+    </div>` : "";
+  poser(`
+    <div class="entete">
+      <span class="etiquette">Dernière étape</span>
+      <h2>${echapper(prenom())}, voici votre menu</h2>
+      <p class="chapeau">Vérifiez vos choix, puis validez pour les transmettre aux organisateurs.</p>
+    </div>
+    <div class="recap">${lignes}${rem}</div>
+    <p class="erreur" id="erreur-envoi">${echapper(erreur)}</p>
+    <button class="bouton large" type="button" id="valider">Valider mon menu</button>`);
+  contenu.querySelectorAll(".modif").forEach((b) => b.addEventListener("click", () => {
+    etat.depuisRecap = true;
+    etat.ecran = b.dataset.ecran === "remarques" ? "remarques" : +b.dataset.ecran;
+    afficher();
+  }));
+  document.getElementById("valider").addEventListener("click", valider);
+}
+
+let reponse = null;
+async function valider() {
+  if (etat.envoi) return;
+  etat.envoi = true;
+  retour.hidden = true;
+  const b = document.getElementById("valider");
+  b.setAttribute("aria-disabled", "true");
+  b.innerHTML = '<span class="rond-charge" aria-hidden="true"></span> Envoi en cours…';
+  try {
+    reponse = await envoyerAuServeur({ nom: etat.nom, choix: etat.choix, remarques: etat.remarques });
+    etat.envoi = false;
+    aller("fin");
+  } catch (err) {
+    etat.envoi = false;
+    ecranRecap(`L'envoi n'a pas fonctionné (${err && err.message ? err.message : "problème de connexion"}). Vérifiez votre connexion internet puis réessayez.`);
+    retour.hidden = false;
+  }
+}
+
+function ecranFin() {
+  const resume = CONFIG.etapes.map((e) => echapper(etat.choix[e.titre])).join(" · ");
+  poser(`
+    <div class="medaille" aria-hidden="true">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    </div>
+    <div class="entete">
+      <h1>C'est noté, merci ${echapper(prenom())} !</h1>
+      <p class="chapeau">${resume}${etat.remarques ? "<br>Remarque : " + echapper(etat.remarques) : ""}</p>
+      <p class="chapeau">${reponse && reponse.misAJour ? "Votre réponse précédente a été remplacée. " : ""}Vous pouvez revenir sur ce lien pour changer d'avis${CONFIG.dateLimite ? " jusqu'au " + echapper(CONFIG.dateLimite) : ""}.</p>
+      ${DEMO ? '<p class="chapeau"><b>Aperçu :</b> une fois relié au Google Sheet, votre menu arrive directement dans le tableau des organisateurs.</p>' : ""}
+    </div>
+    <div class="actions"><button class="bouton secondaire" type="button" id="encore">Modifier mon menu</button></div>`);
+  document.getElementById("encore").addEventListener("click", () => aller("recap"));
+}
+
+// Raccourcis clavier : A, B, C… pour choisir, Échap pour revenir
+document.addEventListener("keydown", (ev) => {
+  if (ev.target.matches("input, textarea") || ev.metaKey || ev.ctrlKey || ev.altKey || !CONFIG) return;
+  if (typeof etat.ecran === "number") {
+    const k = LETTRES.indexOf(ev.key.toUpperCase());
+    if (k >= 0 && k < CONFIG.etapes[etat.ecran].options.length) { ev.preventDefault(); selectionner(etat.ecran, k); }
+  }
+  if (ev.key === "Escape" && !retour.hidden) retour.click();
+});
+
+async function demarrer() {
+  contenu.innerHTML = '<div class="chargement"><span class="rond-charge" aria-hidden="true"></span>Chargement du menu…</div>';
+  try {
+    CONFIG = await chargerConfig();
+    N = CONFIG.etapes.length;
+    totalEcrans = N + (CONFIG.remarques ? 1 : 0) + 1;
+    document.title = "Menu : " + CONFIG.evenement + " · OMAS Internat";
+    etat.ecran = CONFIG.ouvert && N > 0 ? "accueil" : "ferme";
+    afficher();
+  } catch (e) {
+    ecranPanne(e.message || "erreur inconnue");
+  }
+}
+
+demarrer();
+</script>
+</body>
+</html>
